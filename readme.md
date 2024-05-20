@@ -11,3 +11,13 @@ Nodes are installed with kickstart files.
 
 * virt-install with kickstart injection
 * dhcp with automatic hostname dns registration
+
+## kc1
+
+Manually installed kubernetes v1.28 with notes.
+
+## kc2
+
+Ansible installed from internet
+
+* kc2c1 - calico

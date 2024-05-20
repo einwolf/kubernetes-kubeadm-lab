@@ -39,14 +39,14 @@ virsh net-list --all
 
 ```bash
 # Delete existing
-virsh destroy kubehard1-c1
-virsh undefine --remove-all-storage kubehard1-c1
+virsh destroy kc1n1
+virsh undefine --remove-all-storage kc1n1
 ```
 
 ```bash
 # pxe
 # almalinux9 rhel9.4 rhel9-unknown
-virt-install --osinfo almalinux9 --name kubehard1-c1 --vcpus 4 --memory 8192 --disk pool=d1disks,size=100 --network=bridge:br0 --pxe
+virt-install --osinfo almalinux9 --name kc1n1 --vcpus 4 --memory 8192 --disk pool=d1disks,size=100 --network=bridge:br0 --pxe
 ```
 
 ```bash
@@ -54,14 +54,14 @@ virt-install --osinfo almalinux9 --name kubehard1-c1 --vcpus 4 --memory 8192 --d
 --network=bridge:br0,mac=12:34:12:34:12:34
 ```
 
-## Kubehard Cluster 1
+## Kube Cluster 1
 
 ```bash
-virsh destroy kubehard1-c1
-virsh undefine --remove-all-storage kubehard1-c1
+virsh destroy kc1n1
+virsh undefine --remove-all-storage kc1n1
 ```
 
 ```bash
 # kickstart
-virt-install --osinfo almalinux9 --name kh1n1 --vcpus 4 --memory 8192 --disk pool=d1disks,size=200 --network=bridge:br0 --location "/data1/libvirt/d1disks/AlmaLinux-9.3-x86_64-dvd.iso" --initrd-inject "/data1/kickstart/kh1n1.cfg" --extra-args="inst.ks=file:/kh1n1.cfg console=tty0 console=ttyS0,115200n8" --noautoconsole --wait 0
+virt-install --osinfo almalinux9 --name kc1n1 --vcpus 4 --memory 8192 --disk pool=d1disks,size=200 --network=bridge:br0 --location "/data1/libvirt/d1disks/AlmaLinux-9.3-x86_64-dvd.iso" --initrd-inject "/data1/kickstart/kc1n1.cfg" --extra-args="inst.ks=file:/kc1n1.cfg console=tty0 console=ttyS0,115200n8" --noautoconsole --wait 0
 ```
