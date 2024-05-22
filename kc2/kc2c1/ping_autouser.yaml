@@ -1,0 +1,11 @@
+- name: Ping hosts
+  hosts: all
+  gather_facts: false
+  become: true
+  vars_files:
+   - vars/vars_vault.yaml
+  vars:
+    ansible_ssh_password: "{{ kc_ssh_password }}"
+    ansible_become_password: "{{ kc_become_password }}"
+  tasks:
+   - ping:
