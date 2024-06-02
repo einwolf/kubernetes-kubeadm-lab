@@ -1,0 +1,48 @@
+- name: Create /root/kubeinit
+  ansible.builtin.file:
+    state: directory
+    path: /root/kubeinit
+    owner: root
+    group: root
+    mode: "0750"
+- name: Copy kubeadm-config.yaml
+  ansible.builtin.copy:
+    src: kube/kubeadm-config.yaml
+    dest: /root/kubeinit/kubeadm-config.yaml
+    owner: root
+    group: root
+    mode: "0640"
+- name: Run kubeadm init
+  shell:
+    cmd: kubeadm init -v 4 --config /root/kubeinit/kubeadm-config.yaml 2>&1
+  register: kubeadm_init_result
+- name: Save kubeadm init stdout
+  ansible.builtin.copy:
+    content: "{{ kubeadm_init_result.stdout }}"
+    dest: /root/kubeinit/kubeadm_init_stdout.txt
+    owner: root
+    group: root
+    mode: "0600"
+- name: Check for /root/.kube
+  ansible.builtin.stat:
+    path: /root/.kube
+    get_checksum: false
+    get_mime: false
+  register: dotkube_stat
+- name: Create /root/.kube
+  ansible.builtin.file:
+    state: directory
+    path: /root/.kube
+    owner: root
+    group: root
+    mode: "0755"
+  when: not dotkube_stat.stat.exists
+- name: Copy admin kubeconfig to /root/.kube/config
+  ansible.builtin.copy:
+    remote_src: true
+    backup: true
+    src: /etc/kubernetes/admin.conf
+    dest: /root/.kube/config
+    owner: root
+    group: root
+    mode: "0600"

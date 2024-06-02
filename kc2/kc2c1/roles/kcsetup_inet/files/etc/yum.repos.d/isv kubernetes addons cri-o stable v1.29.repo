@@ -1,0 +1,7 @@
+[isv_kubernetes_addons_cri-o_stable_v1.29]
+name=CRI-O v1.29 (Stable) (rpm)
+type=rpm-md
+baseurl=https://download.opensuse.org/repositories/isv:/kubernetes:/addons:/cri-o:/stable:/v1.29/rpm/
+gpgcheck=1
+gpgkey=https://download.opensuse.org/repositories/isv:/kubernetes:/addons:/cri-o:/stable:/v1.29/rpm/repodata/repomd.xml.key
+enabled=1
