@@ -100,10 +100,10 @@ but this container has /bin/sh. (ls doesn't work?)
 ```
 
 ```bash
-kubectl exec -n kube-system -it etcd-wyman-kc1n1 -- /usr/local/bin/etcdctl
+kubectl exec -n kube-system -it etcd-kc1n1 -- /usr/local/bin/etcdctl
 
 # In container
-kubectl exec -n kube-system -it etcd-wyman-kc1n1 -- /usr/local/bin/etcdctl \
+kubectl exec -n kube-system -it etcd-kc1n1 -- /usr/local/bin/etcdctl \
 --endpoints 10.2.18.31:2379 \
 --cert=/etc/kubernetes/pki/etcd/server.crt \
 --key=/etc/kubernetes/pki/etcd/server.key \
@@ -180,7 +180,7 @@ System doesn't meet one or more minimum systems requirements to run Calico
 
 ```bash
 # ipt_set is in xt_set
-[root@wyman-kc1n1 kc1n1]# modinfo xt_set -F alias
+[root@kc1n1 kc1n1]# modinfo xt_set -F alias
 ip6t_SET
 ipt_SET
 ip6t_set
