@@ -1,0 +1,3 @@
+- name: Apply calico manifest
+  ansible.builtin.command:
+    cmd: kubectl apply -f /root/kubeinit/calico/calico-v3.27.2.yaml

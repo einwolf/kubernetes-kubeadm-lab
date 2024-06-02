@@ -1,0 +1,43 @@
+# Setup kubernetes cluster.
+---
+- name: Setup kubernetes cluster (internet source)
+  hosts: all
+  gather_facts: true
+  become: true
+  vars_files:
+    - vars/vars_vault.yaml
+    - vars/cluster_settings.yaml
+  vars:
+    ansible_ssh_password: "{{ kc_ssh_password }}"
+    ansible_become_password: "{{ kc_become_password }}"
+  tasks:
+  # cri-o
+    - name: Install cri-o
+      ansible.builtin.include_role:
+       name: kcsetup_inet
+       tasks_from: setup_crio
+    - name: Start and enable crio service
+      ansible.builtin.systemd:
+        daemon_reload: true
+        name: crio
+        enabled: true
+        state: started
+# kubernetes
+    - name: Install kubernetes
+      ansible.builtin.include_role:
+        name: kcsetup_inet
+        tasks_from: setup_kubernetes
+# calico CNI
+    - name: Install calico
+      ansible.builtin.include_role:
+        name: kcsetup_inet
+        tasks_from: setup_calico
+# kubeadm init first control plane node
+    - name: Run kubeadm init
+      ansible.builtin.include_role:
+        name: kcsetup_inet
+        tasks_from: run_kubeinit
+    - name: Apply calico manifest
+      ansible.builtin.include_role:
+        name: kcsetup_inet
+        tasks_from: apply_calico

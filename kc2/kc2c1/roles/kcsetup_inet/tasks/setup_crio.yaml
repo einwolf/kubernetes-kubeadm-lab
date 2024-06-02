@@ -1,0 +1,36 @@
+# cri-o v1.28 repo (on opensuse.org) has two /etc/cni/net.d file starting at 200-
+# and a crio-tools that would get overwritten when kubernetes RPM is installed (1.28 checked).
+#
+# cri-o v1.28 moved to k8s.io but is still available through opensuse.org.
+# crio-tools is in kubernetes repo for some reason.
+---
+- name: Copy crio repo file
+  ansible.builtin.copy:
+   src: "etc/yum.repos.d/isv kubernetes addons cri-o stable v1.29.repo"
+   dest: /etc/yum.repos.d/
+   owner: root
+   group: root
+   mode: "0664"
+- name: Install crio
+  ansible.builtin.dnf:
+   state: present
+   name:
+    - cri-o-1.29.4
+    # - cri-tools # cri-tools is in k8s.io repo for some reason
+- name: Make CNI off directory
+  ansible.builtin.file:
+    state: directory
+    path: /etc/cni/net.d/off
+    owner: root
+    group: root
+    mode: "0755"
+- name: Check for cri-o CNI config file
+  ansible.builtin.stat:
+    path: /etc/cni/net.d/11-crio-ipv4-bridge.conflist
+    get_checksum: false
+    get_mime: false
+  register: crio_ipv4_bridge_stat
+- name: Turn off crio CNI config
+  ansible.builtin.command:
+    cmd: mv -v /etc/cni/net.d/11-crio-ipv4-bridge.conflist /etc/cni/net.d/off/
+  when: crio_ipv4_bridge_stat.stat.exists

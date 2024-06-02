@@ -3,7 +3,7 @@
 One control three worker kubernetes cluster setup with kubeadm.
 
 * Host hypervisor Fedora 39 using libvirt
-* Nodes run Almalinux 9.3
+* Nodes run Almalinux 9
 
 ## External config
 

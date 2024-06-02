@@ -1,0 +1,9 @@
+- name: Get current nodes
+  ansible.builtin.command: kubectl get nodes -o json
+  register: kubectl_json_nodes
+  delegate_to: '{{ hostvars["K8S_VARS"]["kc_control_name"] }}'
+  changed_when: false
+- name: Store node names in hostvar container
+  ansible.builtin.add_host:
+    name: "K8S_VARS"
+    kc_node_names: '{{ kubectl_json_nodes.stdout | from_json | json_query("items[].metadata.name") }}'
