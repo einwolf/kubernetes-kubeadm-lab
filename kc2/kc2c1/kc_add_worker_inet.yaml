@@ -1,0 +1,80 @@
+# Add worker node
+---
+- name: Get kubernetes cluster facts
+  ansible.builtin.import_playbook: kc_facts.yaml
+- name: Get kubeadm cluster join token
+  hosts: all
+  gather_facts: true
+  become: true
+  vars_files:
+    - vars/vars_vault.yaml
+  vars:
+    ansible_ssh_password: "{{ kc_ssh_password }}"
+    ansible_become_password: "{{ kc_become_password }}"
+  tasks:
+    - name: Debug print hostvars["K8S_VARS"]
+      ansible.builtin.debug:
+        var: hostvars["K8S_VARS"]
+        verbosity: 1
+    - name: Don't join cluster if already in cluster
+      ansible.builtin.include_role:
+        name: kcfacts
+        tasks_from: kc_fail_if_node
+    - name: "Get join token from cluster control node"
+      ansible.builtin.command:
+        cmd: kubeadm token create --ttl 5m --print-join-command
+      register: kc_kubeadm_token
+      delegate_to: '{{ hostvars["K8S_VARS"]["kc_control_name"] }}'
+    - name: Store token in hostvar container
+      ansible.builtin.add_host:
+        name: "K8S_VARS"
+        kubeadm_join_token: "{{ kc_kubeadm_token.stdout }}"
+    - name: Debug print hostvars["K8S_VARS"]["kubeadm_join_token"]
+      ansible.builtin.debug:
+        var: hostvars["K8S_VARS"]["kubeadm_join_token"]
+        verbosity: 1
+- name: Add worker node
+  hosts: all
+  gather_facts: true
+  become: true
+  vars_files:
+    - vars/cluster_settings.yaml
+    - vars/vars_vault.yaml
+  vars:
+    ansible_ssh_password: "{{ kc_ssh_password }}"
+    ansible_become_password: "{{ kc_become_password }}"
+  tasks:
+# cri-o
+    - name: Install cri-o
+      ansible.builtin.include_role:
+        name: kcsetup_inet
+        tasks_from: setup_crio
+    - name: Start and enable crio service
+      ansible.builtin.systemd:
+        daemon_reload: true
+        name: crio
+        enabled: true
+        state: started
+# kubernetes
+    - name: Install kubernetes
+      ansible.builtin.include_role:
+        name: kcsetup_inet
+        tasks_from: setup_kubernetes
+# calico
+    # This is mainly for calicoctl.
+    # Calico containers will get setup automatically.
+    - name: Install kubernetes
+      ansible.builtin.include_role:
+        name: kcsetup_inet
+        tasks_from: setup_calico
+# join
+    - name: Join worker node
+      ansible.builtin.command:
+        cmd: '{{ hostvars["K8S_VARS"]["kubeadm_join_token"] }}'
+    - name: Wait for join to complete
+      ansible.builtin.pause:
+        seconds: 4
+    - name: Add worker label
+      ansible.builtin.command:
+        cmd: "kubectl label node {{ inventory_hostname_short }} node-role.kubernetes.io/worker=worker"
+  

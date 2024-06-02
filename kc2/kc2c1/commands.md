@@ -41,8 +41,8 @@ ansible-playbook -l kc2worker,kc2support -e copy_from_hostname=kc2n1 kc_copy_kub
 ansible -m command -a "sha256sum /root/.kube/config" -b -K kc2nodes
 
 # Install worker
-ansible-playbook -l kc2n2 -e kc_control_name=kc1n1 kc_add_worker_inet.yaml
-ansible-playbook -l kc2worker -e kc_control_name=kc1n1 kc_add_worker_inet.yaml
+ansible-playbook -l kc2n2 -e kc_control_name=kc2n1 kc_add_worker_inet.yaml
+ansible-playbook -l kc2worker -e kc_control_name=kc2n1 kc_add_worker_inet.yaml
 ```
 
 ```bash
