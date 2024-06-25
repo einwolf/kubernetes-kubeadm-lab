@@ -1,3 +1,22 @@
+[kc1control]
+kc1n1
+
+[kc1worker]
+kc1n2
+kc1n3
+kc1n4
+
+#[kc1support]
+#kc1sup
+
+[kc1nodes:children]
+kc1control
+kc1worker
+
+[kc1cluster:children]
+kc1nodes
+kc1support
+
 [kc2control]
 kc2n1
 
