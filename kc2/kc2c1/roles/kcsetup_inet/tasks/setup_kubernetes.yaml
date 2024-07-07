@@ -107,6 +107,10 @@
     owner: root
     group: root
     mode: "0770"
+- name: Check for opt_cni_bin.tar.gz
+  ansible.builtin.stat:
+    path: /root/kubeinit/opt_cni_bin.tar.gz
+  register: cni_archive_stat
 # Backup /opt/cni/bin because CNIs like to add and replace files here
 - name: Backup archive /opt/cni/bin
   community.general.archive:
@@ -116,7 +120,8 @@
     format: gz
     owner: root
     group: root
-    mode: "0660"
+    mode: "0640"
+  when: not cni_archive_stat.stat.exists
 # Service configuration
 - name: Enable kublet but don't start it
   ansible.builtin.systemd:

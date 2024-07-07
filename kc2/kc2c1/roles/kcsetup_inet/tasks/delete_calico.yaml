@@ -6,7 +6,7 @@
 # Assume this is run after kubeadm reset.
 # Reinstalling (any) CNI without kubeadm reset has not been explored.
 ---
-# - name: Apply calico manifest deletion
+# - name: Delete calico manifest
 #   ansible.builtin.command:
 #     cmd: kubectl delete -f /root/kubeinit/calico/calico-v3.27.2.yaml
 - name: Remove calico NetworkManager unmanaged-devices conf

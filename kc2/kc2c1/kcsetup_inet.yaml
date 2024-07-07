@@ -28,7 +28,7 @@
         name: kcsetup_inet
         tasks_from: setup_kubernetes
 # calico CNI
-    - name: Install calico
+    - name: Setup calico
       ansible.builtin.include_role:
         name: kcsetup_inet
         tasks_from: setup_calico

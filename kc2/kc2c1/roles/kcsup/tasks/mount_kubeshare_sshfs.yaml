@@ -14,7 +14,7 @@
     state: directory
     owner: localsysadmin
     group: localsysadmin
-    mode: 0777
+    mode: "0777"
 # selectattr() returns the whole mount information dict. Put it in a list to count the mounts.
 # This assumes one mount and doesn't check for multiple mounts.
 - name: Run unmount {{ mount_dest_path }}

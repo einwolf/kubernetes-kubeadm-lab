@@ -63,7 +63,7 @@
 # calico
     # This is mainly for calicoctl.
     # Calico containers will get setup automatically.
-    - name: Install kubernetes
+    - name: Install calico
       ansible.builtin.include_role:
         name: kcsetup_inet
         tasks_from: setup_calico

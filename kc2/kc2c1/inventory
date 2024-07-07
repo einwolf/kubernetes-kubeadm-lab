@@ -6,8 +6,8 @@ kc1n2
 kc1n3
 kc1n4
 
-#[kc1support]
-#kc1sup
+[kc1support]
+kc1sup
 
 [kc1nodes:children]
 kc1control

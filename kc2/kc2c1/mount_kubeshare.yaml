@@ -11,7 +11,7 @@
     - name: sshfs_password
       prompt: "Enter sshfs mount password"
     - name: sshfs_host
-      prompt: "Enter sshfs host"      
+      prompt: "Enter sshfs host"
   vars_files:
     - vars/vars_vault.yaml
   vars:

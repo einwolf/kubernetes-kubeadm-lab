@@ -10,33 +10,37 @@
     cmd: kubeadm reset -v 4 --force 2>&1
   register: kubeadm_reset_result
 - name: Save kubeadm reset stdout
-  copy:
+  ansible.builtin.copy:
     content: "{{ kubeadm_reset_result.stdout }}"
     dest: /root/kubeinit/kubeadm_reset_stdout.txt
     owner: root
     group: root
     mode: "0600"
-- name: Reset iptables
-  command: "{{ item }}"
-  with_items:
-    - iptables -F
-    - iptables -X
-    - iptables -t nat -F
-    - iptables -t nat -X
-    - iptables -t mangle -F
-    - iptables -t mangle -X
-    # - ipvsadm -C # Not installed
 - name: Stop kublet service
   ansible.builtin.systemd:
     state: stopped
     enabled: false
     name: kubelet
-- name: Restart crio
-  ansible.builtin.systemd:
-    state: restarted
-    name: crio
-- name: Delete crio cni networking state files
+# - name: Reset iptables
+#   command: "{{ item }}"
+#   with_items:
+#     - iptables -F
+#     - iptables -X
+#     - iptables -t nat -F
+#     - iptables -t nat -X
+#     - iptables -t mangle -F
+#     - iptables -t mangle -X
+#     # - ipvsadm -C # Not installed
+- name: Reset nftables
+  command: "{{ item }}"
+  with_items:
+    - nft flush ruleset
+- name: Delete cri-o cni networking state files
   shell: "{{ item }}"
   with_items:
     - rm -rfv /var/lib/cni/networks/*
     - rm -rfv /var/lib/cni/results/*
+- name: Restart crio
+  ansible.builtin.systemd:
+    state: restarted
+    name: crio

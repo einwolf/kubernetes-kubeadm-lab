@@ -12,10 +12,28 @@
     owner: root
     group: root
     mode: "0640"
+# Don't start kubeadm init when images aren't available
+- name: Run kubeadm config images pull
+  shell:
+    cmd: kubeadm -v 4 config images pull --config /root/kubeinit/kubeadm-config.yaml 2>&1
+  register: kubeadm_config_images_pull_result
+  failed_when: false
+- name: Save kubeadm config images pull stdout
+  ansible.builtin.copy:
+    content: "{{ kubeadm_config_images_pull_result.stdout }}"
+    dest: /root/kubeinit/kubeadm_config_images_pull_stdout.txt
+    owner: root
+    group: root
+    mode: "0600"
+- name: Fail if kubeadm config images pull failed
+  fail:
+    msg: "kubeadm config images pull failed"
+  when: kubeadm_config_images_pull_result.rc != 0
 - name: Run kubeadm init
   shell:
     cmd: kubeadm init -v 4 --config /root/kubeinit/kubeadm-config.yaml 2>&1
   register: kubeadm_init_result
+  failed_when: false
 - name: Save kubeadm init stdout
   ansible.builtin.copy:
     content: "{{ kubeadm_init_result.stdout }}"
@@ -23,6 +41,10 @@
     owner: root
     group: root
     mode: "0600"
+- name: Fail if kubeadm init failed
+  fail:
+    msg: "kubeadm init failed"
+  when: kubeadm_init_result.rc != 0
 - name: Check for /root/.kube
   ansible.builtin.stat:
     path: /root/.kube
