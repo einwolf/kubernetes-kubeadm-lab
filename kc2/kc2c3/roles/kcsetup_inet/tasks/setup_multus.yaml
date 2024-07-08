@@ -1,0 +1,29 @@
+---
+# Delete stale config files
+- name: Delete /opt/cni/bin/multus
+  ansible.builtin.file:
+    state: absent
+    path: /opt/cni/bin/multus
+- name: Delete /opt/cni/bin/multus-shim
+  ansible.builtin.file:
+    state: absent
+    path: /opt/cni/bin/multus-shim
+- name: Delete /etc/cni/net.d/00-multus.conf
+  ansible.builtin.file:
+    state: absent
+    path: /etc/cni/net.d/00-multus.conf
+# Copy over manifests
+- name: Create kubeinit/multus
+  ansible.builtin.file:
+    state: directory
+    path: /root/kubeinit/multus
+    owner: root
+    group: root
+    mode: "0640"
+- name: Copy multus manifest
+  ansible.builtin.copy:
+    src: multus/multus-daemonset-thick-v4.0.2.yaml
+    dest: /root/kubeinit/multus/multus-daemonset-thick-v4.0.2.yaml
+    owner: root
+    group: root
+    mode: "0640"

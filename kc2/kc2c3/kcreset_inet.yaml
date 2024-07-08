@@ -1,0 +1,49 @@
+# Delete kubernetes cluster node.
+# This is best effort. Reboot may be required to remove excess veth network devices.
+# Cri-o pods can get confused after repeated cluster creates and deletes. And so forth.
+---
+- name: Get kubernetes cluster facts
+  ansible.builtin.import_playbook: kc_facts.yaml
+- name: Delete kubernetes cluster node
+  hosts: all
+  gather_facts: true
+  become: true
+  vars_files:
+    - vars/cluster_settings.yaml
+    - vars/vars_vault.yaml
+  vars:
+    ansible_ssh_password: "{{ kc_ssh_password }}"
+    ansible_become_password: "{{ kc_become_password }}"
+  tasks:
+# Try to "clean" kubernetes node
+    - name: Drain node
+      ansible.builtin.command: "kubectl drain {{ inventory_hostname_short }} --force --grace-period=10"
+      ignore_errors: true
+# Running CNI delete here removes it from the cluster. (not just the node)
+#
+# kubeadm reset
+# Reset stops and disables kubelet service
+    - name: Run kubeadm reset
+      ansible.builtin.include_role:
+        name: kcsetup_inet
+        tasks_from: run_kubereset
+    - name: Remove kubernetes files
+      ansible.builtin.include_role:
+        name: kcsetup_inet
+        tasks_from: delete_kubernetes.yaml
+    - name: Delete leftover host configuration
+      ansible.builtin.include_role:
+        name: kcsetup_inet
+        tasks_from: delete_hostfiles
+# Delete node from cluster
+# Kublet recreates its node object if delete is run before reset.
+# Deleting the last control node is going to fail.
+    - name: Delete node
+      ansible.builtin.command: "kubectl delete node {{ inventory_hostname_short }}"
+      ignore_errors: true
+      delegate_to: '{{ hostvars["K8S_VARS"]["kc_control_name"] }}'
+# Stop and delete pods in crio
+# Cri-o can have unstoppable pods that need the system rebooted to remove.
+- name: Kill and delete all cri-o pods (failsafe)
+  when: false
+  ansible.builtin.import_playbook: crio_kill_pods.yaml

@@ -1,0 +1,78 @@
+# Print KubeletConfiguration section only
+# kubeadm config print init-defaults --component-configs KubeletConfiguration
+# Edit KubletExtraArgs below to set kublet initial arguments.
+# Edit KUBELET_EXTRA_ARGS in /etc/sysconfig/kublet to change runtime arguments.
+
+apiVersion: kubeadm.k8s.io/v1beta3
+kind: InitConfiguration
+# If bootstrap token is removed it generates a random 24h one.
+# The duration can be set to 1s though.
+# token format is [a-z0-9]{6}\.[a-z0-9]{16}
+bootstrapTokens:
+- groups:
+  - system:bootstrappers:kubeadm:default-node-token
+  token: abcdef.0123456789abcdef
+  ttl: 24h0m0s
+  usages:
+  - signing
+  - authentication
+localAPIEndpoint:
+  advertiseAddress: 192.168.1.170
+  bindPort: 6443
+nodeRegistration:
+  # criSocket: unix:///var/run/containerd/containerd.sock
+  criSocket: unix://var/run/crio/crio.sock
+  imagePullPolicy: IfNotPresent
+  taints: null
+#  KubletExtraArgs:
+#    v: 4
+---
+apiVersion: kubeadm.k8s.io/v1beta3
+kind: ClusterConfiguration
+apiServer:
+  timeoutForControlPlane: 4m0s
+certificatesDir: /etc/kubernetes/pki
+clusterName: kubernetes
+controllerManager: {}
+#controlPlaneEndpoint: "kc2-kubeapi:6443"
+dns: {}
+etcd:
+  local:
+    dataDir: /var/lib/etcd
+    # extraArgs: 
+imageRepository: registry.k8s.io
+kubernetesVersion: 1.29.5
+networking:
+  dnsDomain: cluster.local
+  podSubnet: "10.244.0.0/24"
+  serviceSubnet: "10.96.0.0/16"
+scheduler: {}
+---
+apiVersion: kubelet.config.k8s.io/v1beta1
+kind: KubeletConfiguration
+cgroupDriver: systemd
+# Not needed. clusterDNS is set to coredns container.
+# clusterDNS:
+#   - 10.2.18.39 
+# clusterDomain: ""
+failSwapOn: false
+featureGates:
+  NodeSwap: true
+memorySwap:
+  # LimitedSwap - Only pod QoS Class Burstable can use swap
+  swapBehavior: LimitedSwap
+  # swapBehavior: UnlimitedSwap
+systemReserved:
+  cpu: 500m
+  memory: 256Mi
+---
+apiVersion: kubeproxy.config.k8s.io/v1alpha1
+kind: KubeProxyConfiguration
+# mode: iptables
+mode: nftables
+featureGates:
+  NFTablesProxyMode: true
+nft:
+  masqueradeAll: false
+  syncPeriod: 1m
+  minSyncPeriod: 5s

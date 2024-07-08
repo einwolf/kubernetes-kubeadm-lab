@@ -1,0 +1,3 @@
+cluster_disable_swap: false
+# bridge_hl bridge_dhcp macvlan_dhcp calico
+cluster_net_default: "calico"

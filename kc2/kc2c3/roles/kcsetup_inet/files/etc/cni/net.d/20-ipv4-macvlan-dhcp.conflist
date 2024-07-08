@@ -1,0 +1,14 @@
+{
+    "cniVersion": "1.0.0",
+    "name": "default-macvlan",
+    "plugins": [
+        {
+            "type": "macvlan",
+            "master": "ens192",
+            "ipam": {
+                "type": "dhcp",
+                "daemonSocketPath": "/run/cni/dhcp.sock"
+            }
+        }
+    ]
+}

@@ -1,0 +1,23 @@
+{
+    "cniVersion": "1.0.0",
+    "name": "default-dhcp",
+    "plugins": [
+        {
+            "type": "bridge",
+            "bridge": "cni0",
+            "isGateway": true,
+            "ipMasq": true,
+            "hairpinMode": true,
+            "ipam": {
+                "type": "dhcp",
+                "daemonSocketPath": "/run/cni/dhcp.sock",
+                "provide": [
+                    {
+                        "option": "host-name",
+                        "fromArg": "K8S_POD_NAME"
+                    }
+                ]
+            }
+        }
+    ]
+}

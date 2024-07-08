@@ -1,0 +1,27 @@
+- name: Install epel-release
+  dnf:
+    name: epel-release
+    state: present
+- name: Enable CRB
+  command: /usr/bin/crb enable
+- name: Install fuse-sshfs
+  dnf:
+    name: fuse-sshfs
+    state: present
+- name: Make kubeshare directory
+  file:
+    path: "/home/localsysadmin/kubeshare"
+    state: directory
+    owner: localsysadmin
+    group: localsysadmin
+    mode: "0777"
+# selectattr() returns the whole mount information dict. Put it in a list to count the mounts.
+# This assumes one mount and doesn't check for multiple mounts.
+- name: Run unmount {{ mount_dest_path }}
+  ansible.builtin.command: umount {{ mount_dest_path }}
+  when: ansible_mounts | selectattr("mount", "equalto", mount_dest_path) | list | length > 0
+- name: Run sshfs mount
+  ansible.builtin.shell:
+    cmd: |
+     set -o pipefail
+     echo '{{ sshfs_password }}' | sshfs -o password_stdin -o StrictHostKeyChecking=no {{ mount_source_path }} {{ mount_dest_path }}

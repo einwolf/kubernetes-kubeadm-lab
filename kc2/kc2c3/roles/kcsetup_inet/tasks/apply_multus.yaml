@@ -1,0 +1,7 @@
+---
+- name: Apply multus manifest
+  ansible.builtin.command:
+    cmd: kubectl apply -f /root/kubeinit/multus/multus-daemonset-thick-v4.0.2.yaml
+# - name: Apply multus data1 network manifest
+#  ansible.builtin.command:
+#    cmd: kubectl apply -f /root/kubeinit/multus/multus-daemonset-thick-v4.0.2.yaml

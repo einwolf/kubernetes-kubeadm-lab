@@ -1,0 +1,29 @@
+# Kill all pods running in cri-o.
+# If you do this while kubelet is running it will restart the pods.
+# crictl stopp rarely works on broken pods
+---
+- name: Kill cri-o pods
+  hosts: all
+  gather_facts: false
+  become: true
+  vars_files:
+    - vars/vars_vault.yaml
+  vars:
+    ansible_ssh_password: "{{ kc_ssh_password }}"
+    ansible_become_password: "{{ kc_become_password }}"
+  tasks:
+    - name: Get crio pod IDs
+      ansible.builtin.shell: |
+        set -o pipefail
+        crictl pods | cut -d " " -f 1 | tail -n +2
+      register: crictl_pods
+    - name: Stop pods
+      ansible.builtin.shell:
+        cmd: "crictl stopp {{ item }}"
+      with_items: "{{ crictl_pods.stdout | split('\n') }}"
+      failed_when: false
+    - name: Delete pods
+      ansible.builtin.shell:
+        cmd: "crictl rmp {{ item }}"
+      with_items: "{{ crictl_pods.stdout | split('\n') }}"
+      failed_when: false
