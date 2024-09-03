@@ -1,0 +1,21 @@
+# The is is the internet install so it's installed directly.
+# Probably put the chart tar.gz on a file server for the local install.
+---
+# Helm complains when trying to add a repo that already exists
+- name: Check for cilium helm rep
+  ansible.builtin.shell:
+    cmd: |
+      export PATH="/usr/local/bin:$PATH"
+      helm repo list | grep -F "helm.cilium.io"
+  register: grep_result
+- name: Add cilium helm repo
+  when: grep_result.rc != 0
+  ansible.builtin.shell:
+    cmd: |
+      export PATH="/usr/local/bin:$PATH"
+      helm repo add cilium https://helm.cilium.io/
+- name: Install cilium through helm
+  ansible.builtin.shell:
+    cmd: |
+      export PATH="/usr/local/bin:$PATH"
+      helm install cilium cilium/cilium --version 1.16.1 --namespace kube-system

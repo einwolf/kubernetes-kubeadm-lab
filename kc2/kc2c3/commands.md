@@ -50,8 +50,7 @@ ansible -m command -a "kubeadm reset --force" -b -K kc1worker
 
 ```bash
 # k8s facts test
-ansible-playbook -v -l kc1control -e @kc1_vars.yaml kc_facts.yaml
-
+ansible-playbook -v -l kc1control -e kc_control_name=kc1n1 kc_facts.yaml
 
 # Set control node to run any container
 ansible-playbook -v -l kc1control kc_node_untaint_cp.yaml

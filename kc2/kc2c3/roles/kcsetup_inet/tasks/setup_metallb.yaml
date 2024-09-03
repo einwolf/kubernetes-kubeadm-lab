@@ -1,0 +1,17 @@
+# https://metallb.universe.tf/installation/
+# kubectl apply -f https://raw.githubusercontent.com/metallb/metallb/v0.14.6/config/manifests/metallb-native.yaml
+---
+- name: Create kubeinit/metallb
+  ansible.builtin.file:
+    state: directory
+    path: /root/kubeinit/metallb
+    owner: root
+    group: root
+    mode: "0640"
+- name: Copy metallb manifest
+  ansible.builtin.copy:
+    src: metallb/metallb-native-v0.14.8.yaml
+    dest: /root/kubeinit/metallb/metallb-native-v0.14.8.yaml
+    owner: root
+    group: root
+    mode: "0640"

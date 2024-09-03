@@ -1,0 +1,12 @@
+---
+- name: Apply csi-driver-nfs manifests
+  ansible.builtin.command:
+    cmd: "kubectl apply -f {{ item }}"
+  with_items:
+    - /root/kubeinit/csi-driver-nfs/v4.8.0/rbac-csi-nfs.yaml
+    - /root/kubeinit/csi-driver-nfs/v4.8.0/csi-nfs-driverinfo.yaml
+    - /root/kubeinit/csi-driver-nfs/v4.8.0/csi-nfs-controller.yaml
+    - /root/kubeinit/csi-driver-nfs/v4.8.0/csi-nfs-node.yaml
+    - /root/kubeinit/csi-driver-nfs/v4.8.0/crd-csi-snapshot.yaml
+    - /root/kubeinit/csi-driver-nfs/v4.8.0/rbac-snapshot-controller.yaml
+    - /root/kubeinit/csi-driver-nfs/v4.8.0/csi-snapshot-controller.yaml

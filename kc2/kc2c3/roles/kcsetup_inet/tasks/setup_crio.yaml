@@ -1,18 +1,22 @@
 # cri-o v1.28 repo (on opensuse.org) has two /etc/cni/net.d file starting at 200-
 # and a crio-tools that would get overwritten when kubernetes RPM is installed (1.28 checked).
 ---
+#- name: Delete previous repo file
+#  ansible.builtin.file:
+#    path: "/etc/yum.repos.d/isv kubernetes addons cri-o stable v1.29.repo"
+#    state: absent
 - name: Copy crio repo file
   ansible.builtin.copy:
-   src: "etc/yum.repos.d/isv kubernetes addons cri-o stable v1.29.repo"
-   dest: /etc/yum.repos.d/
-   owner: root
-   group: root
-   mode: "0664"
+    src: "etc/yum.repos.d/isv_kubernetes_addons_cri-o_stable_v1.30.repo"
+    dest: /etc/yum.repos.d/
+    owner: root
+    group: root
+    mode: "0664"
 - name: Install crio
   ansible.builtin.dnf:
    state: present
    name:
-    - cri-o-1.29.4
+    - cri-o-1.30.4
     # - cri-tools # cri-tools is in k8s.io repo for some reason
 - name: Make CNI off directory
   ansible.builtin.file:

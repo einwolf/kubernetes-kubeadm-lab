@@ -3,14 +3,19 @@
   when: cluster_net_default != "bridge_hl" and
         cluster_net_default != "bridge_dhcp" and
         cluster_net_default != "macvlan_dhcp" and
-        cluster_net_default != "calico"
+        cluster_net_default != "calico" and
+        cluster_net_default != "cilium"
   block:
-    - name: Print default network config error 1
+    - name: Print default network choice config error 1
       ansible.builtin.debug:
-        msg: "cluster_net_default needs to be bridge_hl, bridge_dhcp, or calico"
+        msg: "cluster_net_default needs to be bridge_hl, bridge_dhcp, macvlan_dhcp, calico, or cilium"
     - name: Print default network config error 2
       ansible.builtin.fail:
-        msg: "cluster_net_default is set to unknown value {{ cluster_net_default }}"
+        msg: "cluster_net_default choice is set to unknown value {{ cluster_net_default }}"
+- name: Error if cilium is requested but helm is not
+  when: cluster_net_default == "cilium" and not cluster_install_helm
+  ansible.builtin.fail:
+    msg: "Cilium installs through helm so helm must be enabled"
 # Required system settings
 - name: Copy etc/sysctl.d/90-kubernetes.conf
   ansible.builtin.copy:
@@ -32,15 +37,21 @@
   ansible.builtin.systemd:
     state: restarted
     name: systemd-modules-load
+- name: Delete previous kubernetes repo file
+  ansible.builtin.file:
+    path: /etc/yum.repos.d/kubernetes_v1.29.repo
+    state: absent
 - name: Copy kubernetes repo file
   ansible.builtin.copy:
-    src: etc/yum.repos.d/kubernetes_v1.29.repo
+    src: etc/yum.repos.d/kubernetes_v1.30.repo
     dest: /etc/yum.repos.d/
     owner: root
     group: root
     mode: "0664"
 # Install software rpms
 - name: Install kubernetes dependencies
+  # These should be locally available but enable internet.
+  # One of the internet dependent repos will fail to refresh and cause an error.
   ansible.builtin.dnf:
     state: present
     name:
@@ -55,13 +66,13 @@
     state: present
     disable_excludes: kubernetes
     name:
-      - kubectl-1.29.5
-      - kubeadm-1.29.5
-      - kubelet-1.29.5
-      - kubernetes-cni-1.3.0
-      - cri-tools-1.29.0
+      - kubectl-1.30.4
+      - kubeadm-1.30.4
+      - kubelet-1.30.4
+      - kubernetes-cni-1.4.0
+      - cri-tools-1.30.1
 # Disable swap
-- name: Disable swap (when configured)
+- name: Disable swap in fstab (if configured to)
   when: cluster_disable_swap
   block:
     - name: Stop swap
@@ -222,9 +233,15 @@
         name: cni-dhcp.socket
         enabled: true
         state: restarted
-- name: Use default bridge calico
+- name: Use default CNI calico
   when: cluster_net_default == "calico"
   block:
     - name: Copy default calico CNI config
       ansible.builtin.debug:
         msg: "The calico-node container will install a default CNI file"
+- name: Use default CNI cillium
+  when: cluster_net_default == "cillium"
+  block:
+    - name: Copy default cillium CNI config
+      ansible.builtin.debug:
+        msg: "The cillium will install a default CNI file"

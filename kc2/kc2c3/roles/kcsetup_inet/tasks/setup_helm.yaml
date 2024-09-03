@@ -1,0 +1,40 @@
+# Helm doesn't need to be installed on the cluster to work.
+# (it is a control program like kubecli)
+# We are going to run it from the cluster though.
+#
+# curl -LO https://get.helm.sh/helm-v3.15.4-linux-amd64.tar.gz
+# curl -LO https://get.helm.sh/helm-v3.15.4-linux-amd64.tar.gz.sha256sum
+---
+- name: Make kubeinst/helm
+  ansible.builtin.file:
+    path: /root/kubeinst/helm
+    state: directory
+    owner: root
+    group: root
+    mode: "0770"
+- name: Download helm
+  ansible.builtin.get_url:
+    url: "https://get.helm.sh/helm-v3.15.4-linux-amd64.tar.gz"
+    dest: /root/kubeinst/helm/helm-v3.15.4-linux-amd64.tar.gz
+    owner: root
+    group: root
+    mode: "0750"
+- name: Untar helm
+  ansible.builtin.unarchive:
+    src: /root/kubeinst/helm/helm-v3.15.4-linux-amd64.tar.gz
+    dest: /tmp
+    remote_src: true
+- name: Copy helm to /usr/local/bin
+  ansible.builtin.copy:
+    src: /tmp/linux-amd64/helm
+    dest: /usr/local/bin/helm
+    remote_src: true
+    owner: root
+    group: root
+    mode: "0775"
+- name: Delete tmp helm
+  ansible.builtin.file:
+    path: "{{ item }}"
+    state: absent
+  with_items:
+    - /tmp/linux-amd64/

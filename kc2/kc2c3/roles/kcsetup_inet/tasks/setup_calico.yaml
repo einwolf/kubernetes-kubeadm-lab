@@ -1,5 +1,5 @@
-# curl -L https://raw.githubusercontent.com/projectcalico/calico/v3.27.2/manifests/calico.yaml -o calico/calico-v3.27.2.yaml
-# curl -L https://github.com/projectcalico/calico/releases/download/v3.27.2/calicoctl-linux-amd64 -o calico/calicoctl-v3.27.2
+# curl -L https://raw.githubusercontent.com/projectcalico/calico/v3.28.1/manifests/calico.yaml -o calico/calico-v3.28.1.yaml
+# curl -L https://github.com/projectcalico/calico/releases/download/v3.28.1/calicoctl-linux-amd64 -o calico/calicoctl-v3.28.1
 ---
 - name: Create kubeinit/calico
   ansible.builtin.file:
@@ -10,21 +10,35 @@
     mode: "0640"
 - name: Copy calico manifest
   ansible.builtin.copy:
-    src: calico/calico-v3.27.2.yaml
-    dest: /root/kubeinit/calico/calico-v3.27.2.yaml
+    src: calico/calico-v3.28.1.yaml
+    dest: /root/kubeinit/calico/calico-v3.28.1.yaml
+    owner: root
+    group: root
+    mode: "0640"
+- name: Copy calico config manifest
+  ansible.builtin.copy:
+    src: calico/calico-cni-config.yaml
+    dest: /root/kubeinit/calico/calico-cni-config.yaml
+    owner: root
+    group: root
+    mode: "0640"
+- name: Copy calico controller config patch
+  ansible.builtin.copy:
+    src: calico/calico-disable-ipleakcheck.json
+    dest: /root/kubeinit/calico/calico-disable-ipleakcheck.json
     owner: root
     group: root
     mode: "0640"
 - name: Copy calicoctl
   ansible.builtin.copy:
-    src: calico/calicoctl-v3.27.2
-    dest: /root/kubeinit/calico/calicoctl-v3.27.2
+    src: calico/calicoctl-v3.28.1
+    dest: /root/kubeinit/calico/calicoctl-v3.28.1
     owner: root
     group: root
     mode: "0750"
 - name: Copy calicoctl to /usr/local/bin
   ansible.builtin.copy:
-    src: calico/calicoctl-v3.27.2
+    src: calico/calicoctl-v3.28.1
     dest: /usr/local/bin/calicoctl
     owner: root
     group: root

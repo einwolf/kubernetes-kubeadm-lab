@@ -1,3 +1,5 @@
 cluster_disable_swap: false
-# bridge_hl bridge_dhcp macvlan_dhcp calico
+# bridge_hl bridge_dhcp macvlan_dhcp calico cilium
 cluster_net_default: "calico"
+#cluster_net_default: "cilium"
+cluster_install_helm: true

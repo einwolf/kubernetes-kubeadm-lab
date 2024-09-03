@@ -6,8 +6,8 @@
     group: root
     mode: "0750"
 - name: Copy kubeadm-config.yaml
-  ansible.builtin.copy:
-    src: kube/kubeadm-config.yaml
+  ansible.builtin.template:
+    src: kube/kubeadm-config.yaml.j2
     dest: /root/kubeinit/kubeadm-config.yaml
     owner: root
     group: root

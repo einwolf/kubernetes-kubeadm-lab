@@ -1,0 +1,3 @@
+[
+    {"op": "replace", "path":"/spec/controllers/node/leakGracePeriod", "value":"0s"}
+]

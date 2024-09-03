@@ -1,3 +1,57 @@
+# This includes config that needs to be set one time when first control node is created.
+# Adding nodes will automatically have calico pods created.
+---
 - name: Apply calico manifest
   ansible.builtin.command:
-    cmd: kubectl apply -f /root/kubeinit/calico/calico-v3.27.2.yaml
+    cmd: kubectl apply -f /root/kubeinit/calico/calico-v3.28.1.yaml
+- name: Set calico ip-autodetect-mode (kubernetes ip)
+  ansible.builtin.command:
+    cmd: "{{ item }}"
+  with_items:
+    - kubectl -n kube-system set env daemonset/calico-node IP_AUTODETECTION_METHOD=kubernetes-internal-ip
+    - kubectl -n kube-system set env daemonset/calico-node IP6_AUTODETECTION_METHOD=kubernetes-internal-ip
+# - name: Set calico ip-autodetect-mode (cidr net)
+#   ansible.builtin.command:
+#     cmd: "{{ item }}"
+#   with_items:
+#     - kubectl -n kube-system set env daemonset/calico-node IP_AUTODETECTION_METHOD=cidr=192.168.0.0/20
+#     - kubectl -n kube-system set env daemonset/calico-node IP6_AUTODETECTION_METHOD=cidr=???
+# - name: Set calico ip-autodetect-mode (interface)
+#   ansible.builtin.command:
+#     cmd: "{{ item }}"
+#   with_items:
+#     - kubectl -n kube-system set env daemonset/calico-node IP_AUTODETECTION_METHOD=ens192
+#     - kubectl -n kube-system set env daemonset/calico-node IP6_AUTODETECTION_METHOD=ens192
+- name: Apply calico-config ConfigMap
+  ansible.builtin.command:
+    cmd: kubectl apply -f /root/kubeinit/calico/calico-cni-config.yaml
+# Apparently calico-config isn't watched for changes
+- name: Restart calico-node pods for config changes
+  ansible.builtin.command:
+    cmd: kubectl -n kube-system delete pod -l k8s-app=calico-node
+- name: Wait for crd for kubecontrollersconfigurations to be created
+  ansible.builtin.command:
+    cmd: kubectl wait --for condition=established --timeout 20s crd kubecontrollersconfigurations.crd.projectcalico.org
+- name: Wait for kubecontrollersconfigurations default to be created
+  ansible.builtin.shell:
+    cmd: |
+      # kubectl wait generally can't wait for an object to be created
+      TIMEOUT=0
+      RESULT=-1
+      while [ $RESULT -ne 0 ]
+      do
+        if [ TIMEOUT -gt 20 ]
+        then
+          exit 1
+        fi
+
+        kubectl get -n kube-system kubecontrollersconfigurations.crd.projectcalico.org default
+        RESULT=$?
+        echo "kubectl return = $RESULT"
+        sleep 1
+
+        TIMEOUT=$(($TIMEOUT + 1))
+      done
+- name: Apply calico controller config patch
+  ansible.builtin.command:
+    cmd: kubectl -n kube-system patch kubecontrollersconfigurations.crd.projectcalico.org default --type json --patch-file /root/kubeinit/calico/calico-disable-ipleakcheck.json

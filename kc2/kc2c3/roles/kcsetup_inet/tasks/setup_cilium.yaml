@@ -1,0 +1,38 @@
+# Download cilium components
+#
+# Cilium cli binary is named cilium and is the only thing in the tar.
+# curl -OL https://github.com/cilium/cilium-cli/releases/download/v0.16.16/cilium-linux-amd64.tar.gz
+#
+# Use helm instead of cilium install.
+---
+- name: Make kubeinst/cilium
+  ansible.builtin.file:
+    path: /root/kubeinst/cilium
+    state: directory
+    owner: root
+    group: root
+    mode: "0770"
+- name: Download cilium cli
+  ansible.builtin.get_url:
+    url: "https://github.com/cilium/cilium-cli/releases/download/v0.16.16/cilium-linux-amd64.tar.gz"
+    dest: /root/kubeinst/cilium/cilium-linux-amd64.tar.gz
+    owner: root
+    group: root
+    mode: "0750"
+- name: Untar cilium cli
+  ansible.builtin.unarchive:
+    src: /root/kubeinst/cilium/cilium-linux-amd64.tar.gz
+    dest: /usr/local/bin
+    remote_src: true
+- name: Set permissions on /usr/local/bin/cilium
+  ansible.builtin.file:
+    path: /usr/local/bin/cilium
+    owner: root
+    group: root
+    mode: "0775"
+# - name: Delete tmp cilium archives
+#   ansible.builtin.file:
+#     path: "{{ item }}"
+#     state: absent
+#   with_items:
+#     - none currently

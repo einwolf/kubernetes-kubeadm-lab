@@ -1,12 +1,12 @@
 # First kubernetes control machine hostname
 ansible_user: localsysadmin
-cluster_control1: kc2n1
+cluster_control1: kc1n1
 
 # These are used to setup the first control node
 #kubeadm_advertiseAddress is set from cluster_control1 now
-# kubeadm_advertiseAddress: "192.168.2.36"
+# kubeadm_advertiseAddress: "192.168.2.31"
 kubeadm_bindPort: "6443"
-# kubeadm_controlPlaneEndpoint: "kc2-kubeapi:6443"
+# kubeadm_controlPlaneEndpoint: "kc1-kubeapi:6443"
 kubeadm_dnsDomain: "cluster.local"
 kubeadm_podSubnet: "10.244.0.0/24"
 kubeadm_serviceSubnet: "10.96.0.0/16"

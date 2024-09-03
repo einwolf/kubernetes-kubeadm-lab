@@ -1,5 +1,57 @@
 # Setup kubernetes cluster.
 ---
+- name: Configuration check
+  hosts: all
+  gather_facts: true
+  become: true
+  vars_files:
+    - vars/cluster_settings.yaml
+    - vars/vars_vault.yaml
+  vars:
+    ansible_ssh_password: "{{ kc_ssh_password }}"
+    ansible_become_password: "{{ kc_become_password }}"
+  tasks:
+    # Get cluster_control1 ip for kubeadm.config. (advertiseAddress must be an IP.)
+    # Make sure cluster host does the dns lookup.
+    # The ansible controller and kubernetes host have different DNS servers.
+    - name: Get cluster_control1 ip
+      ansible.builtin.shell:
+        cmd: "dig +short +search {{ cluster_control1 }}"
+      delegate_to: "{{ cluster_control1 }}"
+      register: run_dig
+    - name: Set cluster_control1_ip variable
+      ansible.builtin.set_fact:
+        cluster_control1_ip: "{{ run_dig.stdout }}"
+    # controlPlaneEndpoint must be a load balanced DNS name when there is more than one controller.
+    - name: Set cluster config variables
+      ansible.builtin.set_fact:
+        kubeadm_advertiseAddress: "{{ cluster_control1_ip }}"
+        kubeadm_controlPlaneEndpoint: "{{ cluster_control1 }}"
+    - name: Print cluster control host
+      ansible.builtin.debug:
+        msg: "Setup first (only) control node {{ cluster_control1 }} at {{ cluster_control1_ip }}"
+    # - name: Print ansible_facts
+    #   ansible.builtin.debug:
+    #     var: ansible_facts
+    # - name: Print hostvars
+    #   ansible.builtin.debug:
+    #     var: hostvars
+    # - name: Print hostvars[inventory_hostname]
+    #   ansible.builtin.debug:
+    #     var: hostvars[inventory_hostname]
+    # Set flag to stop. Can't exit all plays at once
+    - name: Set exit flag
+      ansible.builtin.set_fact:
+        exit_playbook: false
+        # exit_playbook: true
+    # - name: Check exit flag
+    #   when: exit_playbook
+    #   block:
+    #     - name: Exiting early due to exit_playbook flag
+    #       ansible.builtin.debug:
+    #         msg: Exiting early due to exit_playbook flag
+    #     - name: Exit play
+    #       ansible.builtin.meta: end_play
 - name: Setup kubernetes cluster (internet source)
   hosts: all
   gather_facts: true
@@ -7,7 +59,6 @@
   vars_files:
     - vars/cluster_settings.yaml
     - vars/vars_vault.yaml
-    - vars/cluster_settings.yaml
   vars:
     ansible_ssh_password: "{{ kc_ssh_password }}"
     ansible_become_password: "{{ kc_become_password }}"
@@ -28,30 +79,77 @@
       ansible.builtin.include_role:
         name: kcsetup_inet
         tasks_from: setup_kubernetes
-# calico CNI
+    # Helm
+    - name: Install helm
+      when: cluster_install_helm
+      ansible.builtin.include_role:
+        name: kcsetup_inet
+        tasks_from: setup_helm
+    # Calico CNI
     - name: Setup calico
       when: cluster_net_default == "calico"
       ansible.builtin.include_role:
         name: kcsetup_inet
         tasks_from: setup_calico
-# multus CNI
+    # Cilium CNI
+    - name: Setup cilium
+      when: cluster_net_default == "cilium"
+      ansible.builtin.include_role:
+        name: kcsetup_inet
+        tasks_from: setup_cilium
+    # multus CNI
     - name: Setup multus
       ansible.builtin.include_role:
         name: kcsetup_inet
         tasks_from: setup_multus
-# kubeadm init first control plane node
+    # metallb LoadBalancer
+    - name: Setup metallb
+      ansible.builtin.include_role:
+        name: kcsetup_inet
+        tasks_from: setup_metallb
+    # NFS Containter Storage Interface
+    - name: Setup NFS CSI
+      ansible.builtin.include_role:
+        name: kcsetup_inet
+        tasks_from: setup_csi_nfs
+
+    # kubeadm init first control plane node
     - name: Run kubeadm init
       ansible.builtin.include_role:
         name: kcsetup_inet
         tasks_from: run_kubeinit
+
+    # Calico CNI
     - name: Apply calico manifest
       when: cluster_net_default == "calico"
       ansible.builtin.include_role:
         name: kcsetup_inet
         tasks_from: apply_calico
+    # Cilium CNI
+    - name: Apply cilium (through helm)
+      when: cluster_net_default == "cilium"
+      ansible.builtin.include_role:
+        name: kcsetup_inet
+        tasks_from: apply_cilium
+    # Multus
     - name: Apply multus
       ansible.builtin.include_role:
         name: kcsetup_inet
         tasks_from: apply_multus
+    # MetalLB
+    - name: Apply metallb
+      ansible.builtin.include_role:
+        name: kcsetup_inet
+        tasks_from: apply_metallb
+    # NFS CSI
+    - name: Apply csi-driver-nfs
+      ansible.builtin.include_role:
+        name: kcsetup_inet
+        tasks_from: apply_csi_nfs
+        
 - name: Allow control to run worker pods
   ansible.builtin.import_playbook: kc_node_untaint_cp.yaml
+- name: Install metrics server
+  ansible.builtin.import_playbook: kc_install_metrics_inet.yaml
+- name: Install kubernetes dashboard
+  ansible.builtin.import_playbook: kc_install_dashboard_inet.yaml

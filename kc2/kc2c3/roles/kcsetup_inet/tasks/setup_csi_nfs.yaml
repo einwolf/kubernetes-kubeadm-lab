@@ -1,0 +1,67 @@
+# From https://github.com/kubernetes-csi/csi-driver-nfs/blob/master/deploy/install-driver.sh
+# Using the version specific files in https://github.com/kubernetes-csi/csi-driver-nfs/tree/master/deploy/v4.8.0
+#
+# curl -LO https://raw.githubusercontent.com/kubernetes-csi/csi-driver-nfs/master/deploy/v4.8.0/rbac-csi-nfs.yaml
+# curl -LO https://raw.githubusercontent.com/kubernetes-csi/csi-driver-nfs/master/deploy/v4.8.0/csi-nfs-driverinfo.yaml
+# curl -LO https://raw.githubusercontent.com/kubernetes-csi/csi-driver-nfs/master/deploy/v4.8.0/csi-nfs-controller.yaml
+# curl -LO https://raw.githubusercontent.com/kubernetes-csi/csi-driver-nfs/master/deploy/v4.8.0/csi-nfs-node.yaml
+# curl -LO https://raw.githubusercontent.com/kubernetes-csi/csi-driver-nfs/master/deploy/v4.8.0/crd-csi-snapshot.yaml
+# curl -LO https://raw.githubusercontent.com/kubernetes-csi/csi-driver-nfs/master/deploy/v4.8.0/rbac-snapshot-controller.yaml
+# curl -LO https://raw.githubusercontent.com/kubernetes-csi/csi-driver-nfs/master/deploy/v4.8.0/csi-snapshot-controller.yaml
+---
+- name: Create kubeinit/csi-driver-nfs/v4.8.0
+  ansible.builtin.file:
+    state: directory
+    path: /root/kubeinit/csi-driver-nfs/v4.8.0
+    owner: root
+    group: root
+    mode: "0640"
+- name: Copy rbac-csi-nfs.yaml manifest
+  ansible.builtin.copy:
+    src: csi-driver-nfs/v4.8.0/rbac-csi-nfs.yaml
+    dest: /root/kubeinit/csi-driver-nfs/v4.8.0/rbac-csi-nfs.yaml
+    owner: root
+    group: root
+    mode: "0640"
+- name: Copy csi-nfs-driverinfo.yaml manifest
+  ansible.builtin.copy:
+    src: csi-driver-nfs/v4.8.0/csi-nfs-driverinfo.yaml
+    dest: /root/kubeinit/csi-driver-nfs/v4.8.0/csi-nfs-driverinfo.yaml
+    owner: root
+    group: root
+    mode: "0640"
+- name: Copy csi-nfs-controller.yaml manifest
+  ansible.builtin.copy:
+    src: csi-driver-nfs/v4.8.0/csi-nfs-controller.yaml
+    dest: /root/kubeinit/csi-driver-nfs/v4.8.0/csi-nfs-controller.yaml
+    owner: root
+    group: root
+    mode: "0640"
+- name: Copy csi-nfs-node.yaml manifest
+  ansible.builtin.copy:
+    src: csi-driver-nfs/v4.8.0/csi-nfs-node.yaml
+    dest: /root/kubeinit/csi-driver-nfs/v4.8.0/csi-nfs-node.yaml
+    owner: root
+    group: root
+    mode: "0640"
+- name: Copy crd-csi-snapshot.yaml manifest
+  ansible.builtin.copy:
+    src: csi-driver-nfs/v4.8.0/crd-csi-snapshot.yaml
+    dest: /root/kubeinit/csi-driver-nfs/v4.8.0/crd-csi-snapshot.yaml
+    owner: root
+    group: root
+    mode: "0640"
+- name: Copy rbac-snapshot-controller.yaml manifest
+  ansible.builtin.copy:
+    src: csi-driver-nfs/v4.8.0/rbac-snapshot-controller.yaml
+    dest: /root/kubeinit/csi-driver-nfs/v4.8.0/rbac-snapshot-controller.yaml
+    owner: root
+    group: root
+    mode: "0640"
+- name: Copy csi-snapshot-controller.yaml manifest
+  ansible.builtin.copy:
+    src: csi-driver-nfs/v4.8.0/csi-snapshot-controller.yaml
+    dest: /root/kubeinit/csi-driver-nfs/v4.8.0/csi-snapshot-controller.yaml
+    owner: root
+    group: root
+    mode: "0640"

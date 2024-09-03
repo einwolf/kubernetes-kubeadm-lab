@@ -1,0 +1,4 @@
+---
+- name: Apply metallb manifest
+  ansible.builtin.command:
+    cmd: kubectl apply -f /root/kubeinit/metallb/metallb-native-v0.14.8.yaml

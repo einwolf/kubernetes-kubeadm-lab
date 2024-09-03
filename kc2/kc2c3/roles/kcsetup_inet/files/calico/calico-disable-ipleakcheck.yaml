@@ -1,0 +1,16 @@
+# Disable the Calico IPAM IP pool leak check.
+# When using the Calico IP pool with multus the IPs multus assigns get garbage collected as unassigned in the Calico IP pool leak check.
+# The leak check is run every leakGracePeriod min, and it takes two time periods (check then delete).
+# The IPs will be flagged as leaks by calicoctl ipam check.
+#
+# The default for leakGracePeriod is 15m0s.
+#
+# kubectl -n kube-system patch kubecontrollersconfigurations.crd.projectcalico.org default --patch-file calico-disable-ipleakcheck.yaml
+#
+# Custom resources don't work with stragetic merge patches.
+# kubectl -n kube-system patch kubecontrollersconfigurations.crd.projectcalico.org default --type json --patch-file roles/kcsetup_inet/files/calico/calico-disable-ipleakcheck.json
+---
+spec:
+  controllers:
+    node:
+      leakGracePeriod: 0s

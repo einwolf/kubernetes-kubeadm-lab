@@ -1,3 +1,6 @@
+# kubectl apply -f https://raw.githubusercontent.com/k8snetworkplumbingwg/multus-cni/master/deployments/multus-daemonset-thick.yml
+# Change the image tag from snapshot-thick to v4.1.0-thick
+# In the kube-multus-ds DaemonSet The kube-multus container gets OOMKilled. Change reservation to 100mi.
 ---
 # Delete stale config files
 - name: Delete /opt/cni/bin/multus
@@ -22,8 +25,8 @@
     mode: "0640"
 - name: Copy multus manifest
   ansible.builtin.copy:
-    src: multus/multus-daemonset-thick-v4.0.2.yaml
-    dest: /root/kubeinit/multus/multus-daemonset-thick-v4.0.2.yaml
+    src: multus/multus-daemonset-thick-v4.1.0.yaml
+    dest: /root/kubeinit/multus/multus-daemonset-thick-v4.1.0.yaml
     owner: root
     group: root
     mode: "0640"

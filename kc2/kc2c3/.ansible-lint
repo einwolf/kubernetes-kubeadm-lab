@@ -39,6 +39,9 @@ exclude_paths:
 # to skip_list.
 # var_naming_pattern: "^[a-z_][a-z0-9_]*$"
 
+# Default is more restrictive than what ansible allows.
+var_naming_pattern: "^[a-z_][a-zA-Z0-9_]*$"
+
 use_default_rules: true
 # Load custom rules from this specific folder
 # rulesdir:

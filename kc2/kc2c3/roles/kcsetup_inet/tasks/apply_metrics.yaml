@@ -7,8 +7,8 @@
     mode: "0640"
 - name: Copy metrics server manifest
   ansible.builtin.copy:
-    src: metrics/components-v0.7.0.yaml
-    dest: /root/kubeinit/metrics/components-v0.7.0.yaml
+    src: metrics/components-v0.7.1.yaml
+    dest: /root/kubeinit/metrics/components-v0.7.1.yaml
     owner: root
     group: root
     mode: "0640"
@@ -21,7 +21,7 @@
     mode: "0640"
 - name: Apply metrics server manifest
   ansible.builtin.command:
-    cmd: kubectl apply -f /root/kubeinit/metrics/components-v0.7.0.yaml
+    cmd: kubectl apply -f /root/kubeinit/metrics/components-v0.7.1.yaml
 - name: Apply metrics server server args patch
   ansible.builtin.command:
     cmd: kubectl -n kube-system patch deployment metrics-server --patch-file /root/kubeinit/metrics/patch-metrics-server-args.yaml

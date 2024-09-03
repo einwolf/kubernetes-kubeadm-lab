@@ -60,24 +60,47 @@
       ansible.builtin.include_role:
         name: kcsetup_inet
         tasks_from: setup_kubernetes
-# calico
-    # This is mainly for calicoctl.
-    # Calico containers will get setup automatically.
+    # Helm
+    - name: Install helm
+      when: cluster_install_helm
+      ansible.builtin.include_role:
+        name: kcsetup_inet
+        tasks_from: setup_helm
+
+    # Calico CNI
+    #   This is mainly for calicoctl.
+    #   Calico containers will get setup automatically.
     - name: Install calico
       when: cluster_net_default == "calico"
       ansible.builtin.include_role:
         name: kcsetup_inet
         tasks_from: setup_calico
-# multus
-#   Multus-controller containers will be created automatically
-#   Networking is configured at the pod spec level
-# join
+    # Cilium CNI
+    #   This is mainly for cilium cli.
+    #   Cilium containers will get setup automatically.
+    - name: Setup cilium
+      when: cluster_net_default == "cilium"
+      ansible.builtin.include_role:
+        name: kcsetup_inet
+        tasks_from: setup_cilium
+        
+    # multus
+    #   Multus-controller containers will be created automatically
+    #   Networking is configured at the pod spec level
+    # metallb
+    #   MetalLB controller and speaker will be created automatically
+    #   Configuration is through LoadBalancer objects
+    # NFS CSI
+    #   NFS CSI controller and node will be created automatically
+    #   Configuration is through PersistentVolume objects
+
+    # Join
     - name: Join worker node
       ansible.builtin.command:
         cmd: '{{ hostvars["K8S_VARS"]["kubeadm_join_token"] }}'
     - name: Wait for join to complete
-      ansible.builtin.pause:
-        seconds: 4
+      ansible.builtin.command:
+        cmd: kubectl wait --for condition=Ready node {{ inventory_hostname_short }}
     - name: Add worker label
       ansible.builtin.command:
         cmd: "kubectl label node {{ inventory_hostname_short }} node-role.kubernetes.io/worker=worker"

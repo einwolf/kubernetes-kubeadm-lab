@@ -14,18 +14,18 @@ bootstrapTokens:
   token: abcdef.0123456789abcdef
   ttl: 24h0m0s
   usages:
-  - signing
-  - authentication
+    - signing
+    - authentication
 localAPIEndpoint:
-  advertiseAddress: 192.168.2.31
-  bindPort: 6443
+  advertiseAddress: "{{ kubeadm_advertiseAddress }}"
+  bindPort: {{ kubeadm_bindPort }}
 nodeRegistration:
   # criSocket: unix:///var/run/containerd/containerd.sock
   criSocket: unix://var/run/crio/crio.sock
   imagePullPolicy: IfNotPresent
   taints: null
-  kubeletExtraArgs:
-    v: "4"
+  kubletExtraArgs:
+    v: "2"
 #  node-ip: 192.168.2.31
 ---
 apiVersion: kubeadm.k8s.io/v1beta3
@@ -37,7 +37,7 @@ apiServer:
 certificatesDir: /etc/kubernetes/pki
 clusterName: kubernetes
 controllerManager: {}
-#controlPlaneEndpoint: "kc2-kubeapi:6443"
+controlPlaneEndpoint: "{{ kubeadm_controlPlaneEndpoint }}"
 dns: {}
 etcd:
   local:
@@ -46,9 +46,9 @@ etcd:
 imageRepository: registry.k8s.io
 kubernetesVersion: 1.30.4
 networking:
-  dnsDomain: "cluster.local"
-  podSubnet: "10.244.0.0/24"
-  serviceSubnet: "10.96.0.0/16"
+  dnsDomain: "{{ kubeadm_dnsDomain }}"
+  podSubnet: "{{ kubeadm_podSubnet }}"
+  serviceSubnet: "{{ kubeadm_serviceSubnet }}"
 scheduler: {}
 ---
 apiVersion: kubelet.config.k8s.io/v1beta1
@@ -56,7 +56,7 @@ kind: KubeletConfiguration
 cgroupDriver: systemd
 # Not needed. clusterDNS is set to coredns container.
 # clusterDNS:
-#   - 192.168.2.31
+#   - 192.168.2.31 
 # clusterDomain: ""
 failSwapOn: false
 featureGates:
@@ -81,5 +81,5 @@ featureGates:
   NFTablesProxyMode: true
 nftables:
   masqueradeAll: false
-  syncPeriod: 1m
+  syncPeriod: 30s
   minSyncPeriod: 5s
