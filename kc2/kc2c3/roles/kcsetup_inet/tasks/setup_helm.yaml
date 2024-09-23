@@ -5,9 +5,9 @@
 # curl -LO https://get.helm.sh/helm-v3.15.4-linux-amd64.tar.gz
 # curl -LO https://get.helm.sh/helm-v3.15.4-linux-amd64.tar.gz.sha256sum
 ---
-- name: Make kubeinst/helm
+- name: Make kubeinit/helm
   ansible.builtin.file:
-    path: /root/kubeinst/helm
+    path: /root/kubeinit/helm
     state: directory
     owner: root
     group: root
@@ -15,13 +15,13 @@
 - name: Download helm
   ansible.builtin.get_url:
     url: "https://get.helm.sh/helm-v3.15.4-linux-amd64.tar.gz"
-    dest: /root/kubeinst/helm/helm-v3.15.4-linux-amd64.tar.gz
+    dest: /root/kubeinit/helm/helm-v3.15.4-linux-amd64.tar.gz
     owner: root
     group: root
     mode: "0750"
 - name: Untar helm
   ansible.builtin.unarchive:
-    src: /root/kubeinst/helm/helm-v3.15.4-linux-amd64.tar.gz
+    src: /root/kubeinit/helm/helm-v3.15.4-linux-amd64.tar.gz
     dest: /tmp
     remote_src: true
 - name: Copy helm to /usr/local/bin

@@ -2,6 +2,7 @@
 - name: Check cluster_net_default
   when: cluster_net_default != "bridge_hl" and
         cluster_net_default != "bridge_dhcp" and
+        cluster_net_default != "bridge_whereabouts" and
         cluster_net_default != "macvlan_dhcp" and
         cluster_net_default != "calico" and
         cluster_net_default != "cilium"
@@ -9,9 +10,13 @@
     - name: Print default network choice config error 1
       ansible.builtin.debug:
         msg: "cluster_net_default needs to be bridge_hl, bridge_dhcp, macvlan_dhcp, calico, or cilium"
-    - name: Print default network config error 2
+    - name: Print default network choice config error 2
       ansible.builtin.fail:
         msg: "cluster_net_default choice is set to unknown value {{ cluster_net_default }}"
+- name: Error if bridge_whereabouts is requested but whereabouts is not
+  when: cluster_net_default == "bridge_whereabouts" and not cluster_install_whereabouts
+  ansible.builtin.fail:
+    msg: "bridge_whereabouts uses whereabouts so whereabouts must be installed"
 - name: Error if cilium is requested but helm is not
   when: cluster_net_default == "cilium" and not cluster_install_helm
   ansible.builtin.fail:
@@ -197,6 +202,16 @@
         name: cni-dhcp.socket
         enabled: true
         state: restarted
+- name: Use default bridge whereabouts
+  when: cluster_net_default == "bridge_whereabouts"
+  block:
+    - name: Copy default bridge IPAM whereabouts CNI config
+      ansible.builtin.copy:
+        src: etc/cni/net.d/20-ipv4-bridge-whereabouts.conflist
+        dest: /etc/cni/net.d/20-ipv4-bridge-whereabouts.conflist
+        owner: root
+        group: root
+        mode: "0644"
 - name: Use default macvlan DHCP
   when: cluster_net_default == "macvlan_dhcp"
   block:

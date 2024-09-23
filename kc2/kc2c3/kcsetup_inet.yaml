@@ -74,7 +74,7 @@
         name: crio
         enabled: true
         state: started
-# kubernetes
+    # Kubernetes
     - name: Install kubernetes
       ansible.builtin.include_role:
         name: kcsetup_inet
@@ -102,6 +102,12 @@
       ansible.builtin.include_role:
         name: kcsetup_inet
         tasks_from: setup_multus
+    # Whereabouts CNI
+    - name: Setup whereabouts
+      when: cluster_install_whereabouts
+      ansible.builtin.include_role:
+        name: kcsetup_inet
+        tasks_from: setup_whereabouts
     # metallb LoadBalancer
     - name: Setup metallb
       ansible.builtin.include_role:
@@ -131,11 +137,17 @@
       ansible.builtin.include_role:
         name: kcsetup_inet
         tasks_from: apply_cilium
-    # Multus
+    # Multus CNI
     - name: Apply multus
       ansible.builtin.include_role:
         name: kcsetup_inet
         tasks_from: apply_multus
+    # Whereabouts CNI
+    - name: Apply whereabouts
+      when: cluster_install_whereabouts
+      ansible.builtin.include_role:
+        name: kcsetup_inet
+        tasks_from: apply_whereabouts
     # MetalLB
     - name: Apply metallb
       ansible.builtin.include_role:

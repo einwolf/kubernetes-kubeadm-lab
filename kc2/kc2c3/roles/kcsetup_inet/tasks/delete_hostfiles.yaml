@@ -1,7 +1,5 @@
 # (Attempt to) cleanup host networking configuration so kubeinit can be run again.
 # This is not always going to be successful. The host may need to be rebooted.
-#
-# Some failsafe resets are included because deleting networking can break the cluster.
 ---
 # Reset firewall. This will require restarting crio and kublet to rebuild their rules.
 - name: Reset linux firewall rules
@@ -22,33 +20,3 @@
       command: "{{ item }}"
       with_items:
         - nft flush ruleset
-# Delete DHCP IPAM
-- name: Delete DHCP IPAM
-  when: false
-  block:
-    - name: Stop DHCP IPAM service
-      ansible.builtin.systemd:
-        name: cni-dhcp
-        daemon_reload: true
-        enabled: false
-        state: stopped
-    - name: Delete DHCP IPAM service file
-      ansible.builtin.file:
-        path: /etc/systemd/system/cni-dhcp.service
-        state: absent
-# Delete multus CNI files
-- name: Delete multus CNI (failsafe)
-  when: false
-  block:
-    - name: Delete /opt/cni/bin/multus
-      ansible.builtin.file:
-        stat: absent
-        path: /opt/cni/bin/multus
-    - name: Delete /opt/cni/bin/multus-shim
-      ansible.builtin.file:
-        stat: absent
-        path: /opt/cni/bin/multus-shim
-    - name: Delete /etc/cni/net.d/00-multus.conf
-      ansible.builtin.file:
-        stat: absent
-        path: /etc/cni/net.d/00-multus.conf

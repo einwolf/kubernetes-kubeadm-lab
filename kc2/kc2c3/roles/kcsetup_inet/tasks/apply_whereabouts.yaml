@@ -1,0 +1,7 @@
+- name: Apply whereabouts manifests
+  ansible.builtin.command:
+    cmd: |
+      kubectl apply
+      -f /root/kubeinit/whereabouts/v0.8.0/daemonset-install.yaml
+      -f /root/kubeinit/whereabouts/v0.8.0/whereabouts.cni.cncf.io_ippools.yaml
+      -f /root/kubeinit/whereabouts/v0.8.0/whereabouts.cni.cncf.io_overlappingrangeipreservations.yaml

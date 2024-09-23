@@ -1,0 +1,41 @@
+# Manifests have the :latest tag changed to :v0.8.0
+# curl -O https://raw.githubusercontent.com/k8snetworkplumbingwg/whereabouts/master/doc/crds/daemonset-install.yaml
+# curl -O https://raw.githubusercontent.com/k8snetworkplumbingwg/whereabouts/master/doc/crds/node-slice-controller.yaml
+# curl -O https://raw.githubusercontent.com/k8snetworkplumbingwg/whereabouts/master/doc/crds/whereabouts.cni.cncf.io_ippools.yaml
+# curl -O https://raw.githubusercontent.com/k8snetworkplumbingwg/whereabouts/master/doc/crds/whereabouts.cni.cncf.io_overlappingrangeipreservations.yaml
+---
+- name: Make kubeinit/whereabouts
+  ansible.builtin.file:
+    path: /root/kubeinit/whereabouts/v0.8.0
+    state: directory
+    owner: root
+    group: root
+    mode: "0770"
+- name: Copy daemonset-install.yaml to kubeinit/whereabouts
+  ansible.builtin.copy:
+    src: whereabouts/v0.8.0/daemonset-install.yaml
+    dest: /root/kubeinit/whereabouts/v0.8.0/daemonset-install.yaml
+    owner: root
+    group: root
+    mode: "0775"
+- name: Copy node-slice-controller.yaml to kubeinit/whereabouts
+  ansible.builtin.copy:
+    src: whereabouts/v0.8.0/node-slice-controller.yaml
+    dest: /root/kubeinit/whereabouts/v0.8.0/node-slice-controller.yaml
+    owner: root
+    group: root
+    mode: "0775"
+- name: Copy whereabouts.cni.cncf.io_ippools.yaml to kubeinit/whereabouts
+  ansible.builtin.copy:
+    src: whereabouts/v0.8.0/whereabouts.cni.cncf.io_ippools.yaml
+    dest: /root/kubeinit/whereabouts/v0.8.0/whereabouts.cni.cncf.io_ippools.yaml
+    owner: root
+    group: root
+    mode: "0775"
+- name: Copy whereabouts.cni.cncf.io_overlappingrangeipreservations.yaml to kubeinit/whereabouts
+  ansible.builtin.copy:
+    src: whereabouts/v0.8.0/whereabouts.cni.cncf.io_overlappingrangeipreservations.yaml
+    dest: /root/kubeinit/whereabouts/v0.8.0/whereabouts.cni.cncf.io_overlappingrangeipreservations.yaml
+    owner: root
+    group: root
+    mode: "0775"

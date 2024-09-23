@@ -15,14 +15,14 @@
     ansible_ssh_password: "{{ kc_ssh_password }}"
     ansible_become_password: "{{ kc_become_password }}"
   tasks:
-# Try to "clean" kubernetes node
+    # Try to "clean" kubernetes node
     - name: Drain node
       ansible.builtin.command: "kubectl drain {{ inventory_hostname_short }} --force --grace-period=10 --ignore-daemonsets --delete-emptydir-data"
       ignore_errors: true
-# Running CNI delete here removes it from the cluster. (not just the node)
-#
-# kubeadm reset
-# Reset stops and disables kubelet service
+    # Running CNI delete here removes it from the cluster. (not just the node)
+    #
+    # kubeadm reset
+    # Reset stops and disables kubelet service
     - name: Run kubeadm reset
       ansible.builtin.include_role:
         name: kcsetup_inet
@@ -35,9 +35,9 @@
       ansible.builtin.include_role:
         name: kcsetup_inet
         tasks_from: delete_hostfiles
-# Delete node from cluster
-# Kublet recreates its node object if delete is run before reset.
-# Deleting the last control node is going to fail.
+    # Delete node from cluster
+    # Kublet recreates its node object if delete is run before reset.
+    # Deleting the last control node is going to fail.
     - name: Delete node
       ansible.builtin.command: "kubectl delete node {{ inventory_hostname_short }}"
       ignore_errors: true

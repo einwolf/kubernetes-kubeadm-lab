@@ -1,0 +1,25 @@
+{
+    "cniVersion": "1.0.0",
+    "name": "default-bridge",
+    "plugins": [
+        {
+            "type": "bridge",
+            "bridge": "cni0",
+            "isGateway": false,
+            "isDefaultGateway": true,
+            "ipMasq": true,
+            "hairpinMode": true,
+            "forceAddress": false,
+            "ipam": {
+                "type": "whereabouts",
+                "range": "10.244.0.0/16",
+                "exclude": [
+                    "10.244.0.0/24"
+                ],
+                "log_level": "debug",
+                "log_file": "/var/log/whereabouts_cni0_log.txt"
+            }
+        }
+    ]
+}
+

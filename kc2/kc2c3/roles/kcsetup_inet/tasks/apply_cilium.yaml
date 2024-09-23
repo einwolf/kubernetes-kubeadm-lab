@@ -2,9 +2,10 @@
 # Probably put the chart tar.gz on a file server for the local install.
 ---
 # Helm complains when trying to add a repo that already exists
-- name: Check for cilium helm rep
+- name: Check for cilium helm repo
   ansible.builtin.shell:
     cmd: |
+      set -o pipefail
       export PATH="/usr/local/bin:$PATH"
       helm repo list | grep -F "helm.cilium.io"
   register: grep_result

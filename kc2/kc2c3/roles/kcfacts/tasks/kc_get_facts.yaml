@@ -1,5 +1,5 @@
 - name: Get current nodes
-  ansible.builtin.command: kubectl get nodes -o json
+  ansible.builtin.shell: kubectl get nodes -o json
   register: kubectl_json_nodes
   delegate_to: '{{ hostvars["K8S_VARS"]["kc_control_name"] }}'
   changed_when: false

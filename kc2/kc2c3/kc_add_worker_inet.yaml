@@ -55,7 +55,7 @@
         name: crio
         enabled: true
         state: started
-# kubernetes
+    # kubernetes
     - name: Install kubernetes
       ansible.builtin.include_role:
         name: kcsetup_inet
@@ -83,11 +83,14 @@
       ansible.builtin.include_role:
         name: kcsetup_inet
         tasks_from: setup_cilium
-        
-    # multus
+
+    # Multus
     #   Multus-controller containers will be created automatically
     #   Networking is configured at the pod spec level
-    # metallb
+    # Whereabouts
+    #   Whereabout pod and controller will be created automatically
+    #   Networking is configured though multus
+    # MetalLB
     #   MetalLB controller and speaker will be created automatically
     #   Configuration is through LoadBalancer objects
     # NFS CSI

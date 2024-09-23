@@ -1,6 +1,7 @@
 # Remove the control plane taint from a node so it can run worker pods
+# Remove the exclude external load balancers label so LoadBalancers can expose services
 ---
-- name: Remove control plane taint
+- name: Allow control plane to run worker loads
   hosts: all
   gather_facts: false
   become: true
@@ -12,4 +13,7 @@
   tasks:
     - name: Remove control plane taint
       ansible.builtin.command: "kubectl taint nodes {{ inventory_hostname_short }} node-role.kubernetes.io/control-plane-"
+      changed_when: true
+    - name: Remove control plane exclude from external LoadBalancers label
+      ansible.builtin.command: "kubectl label node {{ inventory_hostname_short }} node.kubernetes.io/exclude-from-external-load-balancers-"
       changed_when: true

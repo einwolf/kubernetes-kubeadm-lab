@@ -1,0 +1,6 @@
+- name: Remove whereabouts files from host
+  ansible.builtin.file:
+    state: absent
+    path: "{{ item }}"
+  with_items:
+    - /opt/cni/bin/whereabouts

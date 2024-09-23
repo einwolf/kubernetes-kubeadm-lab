@@ -1,7 +1,7 @@
 # This is used to delete files left on the host node after kubeadm reset.
-# kubectl delete -f manifest.yaml may delete them, but that would delete the
-# manifest from the entire cluster.
+# Files that kubectl delete -f manifest.yaml does not remove.
 ---
+# Delete the host-local and DHCP configuration
 - name: Delete default bridge host-local
   when: cluster_net_default == "bridge_hl"
   block:
@@ -26,6 +26,13 @@
       ansible.builtin.file:
         path: /etc/cni/net.d/20-ipv4-bridge-dhcp.conflist
         state: absent
+- name: Delete default bridge whereabouts
+  when: cluster_net_default == "bridge_whereabouts"
+  block:
+    - name: Delete default bridge IPAM whereabouts CNI config
+      ansible.builtin.file:
+        path: /etc/cni/net.d/20-ipv4-bridge-whereabouts.conflist
+        state: absent
 - name: Delete default macvlan DHCP
   when: cluster_net_default == "macvlan_dhcp"
   block:
@@ -43,14 +50,23 @@
       ansible.builtin.file:
         path: /etc/cni/net.d/20-ipv4-macvlan-dhcp.conflist
         state: absent
-- name: Delete default bridge calico
+# Delete calico CNI files
+- name: Delete default CNI calico
   when: cluster_net_default == "calico"
   block:
     - name: Run delete_calico
       ansible.builtin.include_role:
         name: kcsetup_inet
         tasks_from: delete_calico
-# Delete multus files
+# Delete cilium CNI files
+- name: Delete default CNI cilium
+  when: cluster_net_default == "cilium"
+  block:
+    - name: Run delete_cilium
+      ansible.builtin.include_role:
+        name: kcsetup_inet
+        tasks_from: delete_cilium
+# Delete multus CNI files
 - name: Delete /opt/cni/bin/multus
   ansible.builtin.file:
     state: absent
@@ -63,3 +79,14 @@
   ansible.builtin.file:
     state: absent
     path: /etc/cni/net.d/00-multus.conf
+# Delete whereabouts CNI files
+- name: Delete whereabouts CNI files
+  when: cluster_install_whereabouts
+  block:
+    - name: Delete whereabouts files
+      ansible.builtin.file:
+        state: absent
+        path: "{{ item }}"
+      with_items:
+        - /opt/cni/bin/whereabouts
+        - /etc/cni/net.d/whereabouts.d

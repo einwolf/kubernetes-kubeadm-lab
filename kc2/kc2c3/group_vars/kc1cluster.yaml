@@ -8,5 +8,5 @@ cluster_control1: kc1n1
 kubeadm_bindPort: "6443"
 # kubeadm_controlPlaneEndpoint: "kc1-kubeapi:6443"
 kubeadm_dnsDomain: "cluster.local"
-kubeadm_podSubnet: "10.244.0.0/24"
+kubeadm_podSubnet: "10.244.0.0/16"
 kubeadm_serviceSubnet: "10.96.0.0/16"
