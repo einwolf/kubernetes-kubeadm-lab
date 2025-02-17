@@ -1,5 +1,7 @@
 #!/bin/bash
 
+export VIRSH_DEFAULT_CONNECT_URI=qemu:///system
+
 virsh destroy kc1n1
 virsh undefine --remove-all-storage kc1n1
 

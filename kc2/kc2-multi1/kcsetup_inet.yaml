@@ -159,7 +159,7 @@
         name: kcsetup_inet
         tasks_from: apply_csi_nfs
         
-- name: Allow control to run worker pods
+- name: Allow control to run worker loads
   ansible.builtin.import_playbook: kc_node_untaint_cp.yaml
 - name: Install metrics server
   ansible.builtin.import_playbook: kc_install_metrics_inet.yaml

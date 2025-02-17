@@ -1,7 +1,0 @@
-- name: Check if this host is already a cluster node
-  when: 'inventory_hostname_short in hostvars["K8S_VARS"]["kc_node_names"]'
-  block:
-  - name: Fail when host is already a cluster node
-    ansible.builtin.fail:
-      msg: Host is already a cluster node
-

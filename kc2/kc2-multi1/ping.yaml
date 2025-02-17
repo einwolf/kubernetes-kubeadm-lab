@@ -1,0 +1,13 @@
+- name: Ping hosts
+  hosts: all
+  serial: 1
+  gather_facts: false
+  become: true
+  tasks:
+  - name: Remove ssh host keys
+    delegate_to: localhost
+    become: false
+    ansible.builtin.command:
+      cmd: "ssh-keygen -R {{ inventory_hostname }}"
+  - name: Ping host
+    ping:
