@@ -103,7 +103,7 @@
         cmd: '{{ hostvars["K8S_VARS"]["kubeadm_join_token"] }}'
     - name: Wait for join to complete
       ansible.builtin.command:
-        cmd: kubectl wait --for condition=Ready node {{ inventory_hostname_short }}
+        cmd: kubectl wait --timeout 60s --for condition=Ready node {{ inventory_hostname_short }}
     - name: Add worker label
       ansible.builtin.command:
         cmd: "kubectl label node {{ inventory_hostname_short }} node-role.kubernetes.io/worker=worker"
