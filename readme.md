@@ -7,8 +7,8 @@ One control three worker kubernetes cluster setup with kubeadm.
 
 Assignment
 
-* kc2c1 -> kc1
-* kc2c3 -> kc2
+* kc2 - original CNI selection
+* kc3 - after refactor
 
 ## External config
 
@@ -25,5 +25,10 @@ Manually installed kubernetes v1.28 with notes.
 
 Ansible installed from internet
 
-* kc2c1 - calico
-* kc2c3 - multus with several backends
+Multus with several backends
+
+## kc3
+
+Refactor
+
+kube-virt
